@@ -7,6 +7,8 @@ name = "pypi"
 requests = "*"
 django = "*"
 mysqlclient = "*"
+python-dotenv = "*"
+gql = {extras = ["aiohttp"], version = "*"}
 
 [dev-packages]
 

@@ -27,6 +27,9 @@ services:
       - 8000:8000
     volumes:
       - .:/app
+      - type: bind
+        source: ./.env
+        target: /app/.env
     networks:
       - db-network
     depends_on:
