@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  db:
+    image: mysql:8
+    restart: always
+    environment: 
+      MYSQL_DATABASE: 'xivlogs'
+      MYSQL_USER: 'dev'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - 3306:3306
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - db-network
+  django:
+    build: .
+    command: pipenv run python manage.py runserver 0.0.0.0:8000
+    environment:
+      DB_HOST: db
+      DB_USER: 'dev'
+      DB_PASSWORD: 'password'
+      DJANGO_SECURITY_KEY: 'abc123'
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/app
+    networks:
+      - db-network
+    depends_on:
+      - db
+
+volumes:
+  db-data:
+    driver: local
+
+networks:
+  db-network:
+    driver: bridge
