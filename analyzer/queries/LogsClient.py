@@ -4,14 +4,14 @@ from gql.transport.aiohttp import AIOHTTPTransport
 import requests
 from requests.auth import HTTPBasicAuth
 
-class LogsClient:
-    def __init__(self, auto_request_token=True):
-        if auto_request_token is False:
-            self.token = None
-            self.client = None
-            return
 
-        self.token = self.fetch_token()
+class LogsClient:
+    def __init__(self, token=None):
+        if token is not None:
+            self.token = token
+        else:
+            self.token = self.fetch_token()
+
         self.client = self.setup_client()
 
     def fetch_token(self):

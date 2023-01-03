@@ -4,8 +4,12 @@ from .fflogs_url_parser import get_report_code_from_url
 from .LogsClient import LogsClient
 from analyzer.entities.Fight import Fight
 
-def find_fights(report_url: str, difficulty_filter=100):
+
+def find_fights_by_url(report_url: str, difficulty_filter=100):
     report_code = get_report_code_from_url(report_url)
+    return find_fights_by_code(report_code, difficulty_filter=difficulty_filter)
+
+def find_fights_by_code(report_code: str, difficulty_filter=100):
     variables = {'code': report_code}
     client = LogsClient()
     

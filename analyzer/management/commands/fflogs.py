@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 
-from analyzer.queries.fights import find_fights
+from analyzer.queries.fights import find_fights_by_url
 from analyzer.queries.events import find_events_for_encounter
 
 class Command(BaseCommand):
@@ -14,7 +14,7 @@ class Command(BaseCommand):
         if not report:
             raise Exception("Missing FFLogs report URL")
 
-        fights = find_fights(report)
+        fights = find_fights_by_url(report)
         print(fights)
 
         for fight in fights:

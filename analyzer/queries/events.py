@@ -1,7 +1,12 @@
 from gql import gql
 from pprint import pprint
+import re
 
-from .LogsClient import LogsClient
+from analyzer.queries.LogsClient import LogsClient
+from analyzer.entities.Event import Event
+
+
+EVENTS_TO_SKIP = set(['combatantinfo', 'gaugeupdate'])
 
 def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int, kill: bool = True):
     client = LogsClient()
@@ -28,6 +33,7 @@ def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int
 
     start_time = 0
     events = []
+    event_types = set()
     while start_time is not None:
         variables = {
             'code': report_code,
@@ -40,12 +46,24 @@ def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int
 
         result = client.execute(query, variables=variables)
         event_data = result['reportData']['report']['events']['data']
-        #  pprint(events)
         for event in event_data:
             print(event.keys())
-            events.append(event_data)
+            print(event['type'])
+            event_types.add(event['type'])
+            if event['type'] in EVENTS_TO_SKIP:
+                continue
+            try:
+                events.append(Event(**{ to_snake_case(k): v for k, v in event.items() }))
+            except TypeError as e:
+                pprint(event)
+                raise e
 
         start_time = result['reportData']['report']['events']['nextPageTimestamp']
         print("start time",start_time)
 
+    pprint(event_types)
     return events
+
+
+def to_snake_case(s: str) -> str:
+    return re.sub('([A-Z]+)', r'_\1', s).lower()
