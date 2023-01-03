@@ -13,7 +13,7 @@ def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int
     
     query = gql(
         """
-        query ReportData($code: String!, $startTime: Float, $encounterId: Int, $fightIds: [Int], $killType: KillType) {
+        query Events($code: String!, $startTime: Float, $encounterId: Int, $fightIds: [Int], $killType: KillType) {
                 reportData {
                     report(code: $code) {
                         events(startTime: $startTime, encounterID: $encounterId, fightIDs: $fightIds, killType: $killType) {
