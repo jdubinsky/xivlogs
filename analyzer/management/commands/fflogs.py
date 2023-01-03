@@ -1,56 +1,24 @@
 from django.core.management.base import BaseCommand
-from django.conf import settings
 
-import requests
-from requests.auth import HTTPBasicAuth
-from gql import gql, Client
-from gql.transport.aiohttp import AIOHTTPTransport
+from analyzer.queries.fights import find_fights
+from analyzer.queries.events import find_events_for_encounter
 
 class Command(BaseCommand):
     help = 'Prints out data from an FFLogs report.'
 
+    def add_arguments(self, parser):
+        parser.add_argument('-r', '--report', type=str, help='URL to fflogs report.')
+
     def handle(self, *args, **kwargs):
-        basic_auth = HTTPBasicAuth(
-            settings.FFLOGS_CLIENT_ID,
-            settings.FFLOGS_CLIENT_SECRET,
-        )
+        report = kwargs['report']
+        if not report:
+            raise Exception("Missing FFLogs report URL")
 
-        response = requests.post(
-            settings.FFLOGS_TOKEN_URL,
-            auth=basic_auth,
-            data={'grant_type': 'client_credentials'},
-        )
+        fights = find_fights(report)
+        print(fights)
 
-        print(response)
-        print(response.status_code)
-        print(response.content)
-        print(response.json().keys())
-        token = response.json()['access_token']
-        print(token)
-
-        transport = AIOHTTPTransport(
-            url=settings.FFLOGS_GQL_URL,
-            headers={'Authorization': f'Bearer {token}'},
-        )
-        client = Client(
-            transport=transport,
-            fetch_schema_from_transport=True,
-        )
-
-        query = gql(
-            """
-            query ReportData($code: String!) {
-                reportData {
-                    report(code: $code) {
-                        owner {
-                            id
-                            name
-                        }
-                    }
-                }
-            }
-            """
-        )
-
-        result = client.execute(query, variable_values={'code': 'zbR2CcnYDPv8qwZx'})
-        print(result)
+        for fight in fights:
+            if fight.kill is True:
+                print(fight)
+                events = find_events_for_encounter(fight.report_code, fight.encounter_id, fight.id)
+                break
