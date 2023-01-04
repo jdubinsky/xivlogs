@@ -8,7 +8,7 @@ from analyzer.entities.Event import Event
 
 EVENTS_TO_SKIP = set(['combatantinfo', 'gaugeupdate'])
 
-def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int, kill: bool = True):
+def find_events_for_fight(report_code: str, fight_id: int, kill: bool = True):
     client = LogsClient()
     
     query = gql(
@@ -37,7 +37,6 @@ def find_events_for_encounter(report_code: str, encounter_id: int, fight_id: int
     while start_time is not None:
         variables = {
             'code': report_code,
-            'encounterId': encounter_id,
             'fightIds': [fight_id],
             'killType': kill_type,
             'startTime': start_time,

@@ -19,5 +19,7 @@ from analyzer import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('fights/<str:report_code>', views.fights),
+    path('reports/<str:report_code>/fights', views.fights),
+    path('reports/<str:report_code>/fights/<int:fight_id>/players/', views.players),
+    path('reports/<str:report_code>/fights/<int:fight_id>/events/', views.events),
 ]
